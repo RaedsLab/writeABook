@@ -62,14 +62,14 @@
                                         for (var i = 0; i < data.results.length; i++) {
                                             finalText += data.results[i].text + " ";
                                         }
-                                        $("#thePiece").html(finalText);
+                                        $("#thePiece").html(finalText.replace(/</g, "&lt;").replace(/>/g, "&gt;"));
                                     }
                                 }
                                 );
                             }
 
                             function addText() {
-                                var t = $("#word").val();
+                                var t = $("#word").val().replace(/</g, "&lt;").replace(/>/g, "&gt;");
                                 console.log("adding " + t + " !");
                                 $.ajax({
                                     url: 'https://api.parse.com/1/classes/text',
