@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Write a book</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.4/flatly/bootstrap.min.css" />
+
+    </head>
+
+    <body>
+
+        <div class="container">
+            <div class="row clearfix">
+                <div class="col-md-12 column">
+                    <h3>
+                        <!--h3. Lorem ipsum dolor sit amet.-->
+                    </h3>
+                    <nav class="navbar navbar-default" role="navigation">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> 
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button> 
+                            <a class="navbar-brand" href="/">Write a Book: dev [Raed]</a>
+                        </div>
+                    </nav>
+
+
+                    <div>
+                        <input type="text" id="word" placeholder="Write something.." maxlength="140" autofocus="autofocus" />
+                        <button onclick="addText()" type="button" id="send">Write</button>
+                    </div>
+                    <br>
+                    <div id="thePiece" class="well">
+                        Loading the book.
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <script src="js/jquery/jquery.min.js"></script>
+        <script>
+                            "use strict";
+                            function getText() {
+                                var finalText = "";
+                                console.log("ready!");
+                                $.ajax({
+                                    url: 'https://api.parse.com/1/classes/text',
+                                    type: 'get',
+                                    headers: {
+                                        "Content-Type": 'application/json',
+                                        "X-Parse-Application-ID": '3xx3CfBwwkCkHcLok4F8ODmVENZjQ0YPXYYJMzCT',
+                                        "X-Parse-REST-API-Key": 'LrbuMV5t4H1ReGkaHc3QVpz4JInd8agUltaEdG6y',
+                                    },
+                                    success: function (data) {
+                                        for (var i = 0; i < data.results.length; i++) {
+                                            finalText += data.results[i].text + " ";
+                                        }
+                                        $("#thePiece").html(finalText);
+                                    }
+                                }
+                                );
+                            }
+
+                            function addText() {
+                                var t = $("#word").val();
+                                console.log("adding " + t + " !");
+                                $.ajax({
+                                    url: 'https://api.parse.com/1/classes/text',
+                                    type: 'post',
+                                    data: "{\"text\":\"" + t + "\"}"
+                                    ,
+                                    headers: {
+                                        "Content-Type": 'application/json',
+                                        "X-Parse-Application-ID": '3xx3CfBwwkCkHcLok4F8ODmVENZjQ0YPXYYJMzCT',
+                                        "X-Parse-REST-API-Key": 'LrbuMV5t4H1ReGkaHc3QVpz4JInd8agUltaEdG6y',
+                                    },
+                                    success: function (data) {
+                                        $("#thePiece").html($("#thePiece").html() + " " + t);
+                                        setTimeout(function () {
+                                            console.log(data.objectId);
+                                        }, 3000);
+                                        getText();
+                                    }
+                                }
+                                );
+                            }
+
+
+
+                            $(document).ready(function () {
+                                getText();
+                                setInterval(function () {
+                                    getText();
+                                }, 5000);
+                            });
+
+        </script>
+
+    </body>
+
+</html>
