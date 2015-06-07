@@ -19,12 +19,12 @@
                     </h3>
                     <nav class="navbar navbar-default" role="navigation">
                         <div class="navbar-header">
-                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> 
+                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                                 <span class="sr-only">Toggle navigation</span>
                                 <span class="icon-bar"></span>
                                 <span class="icon-bar"></span>
                                 <span class="icon-bar"></span>
-                            </button> 
+                            </button>
                             <a class="navbar-brand" href="/">Write a Book: dev [Raed]</a>
                         </div>
                     </nav>
@@ -36,7 +36,7 @@
                     </div>
                     <br>
                     <div id="thePiece" class="well">
-                        Loading the book.
+                        Loading the book...
                     </div>
 
                 </div>
@@ -46,61 +46,64 @@
 
         <script src="js/jquery/jquery.min.js"></script>
         <script>
-                            "use strict";
-                            function getText() {
-                                var finalText = "";
-                                console.log("ready!");
-                                $.ajax({
-                                    url: 'https://api.parse.com/1/classes/text',
-                                    type: 'get',
-                                    headers: {
-                                        "Content-Type": 'application/json',
-                                        "X-Parse-Application-ID": '3xx3CfBwwkCkHcLok4F8ODmVENZjQ0YPXYYJMzCT',
-                                        "X-Parse-REST-API-Key": 'LrbuMV5t4H1ReGkaHc3QVpz4JInd8agUltaEdG6y',
-                                    },
-                                    success: function (data) {
-                                        for (var i = 0; i < data.results.length; i++) {
-                                            finalText += data.results[i].text + " ";
-                                        }
-                                        $("#thePiece").html(finalText.replace(/</g, "&lt;").replace(/>/g, "&gt;"));
-                                    }
-                                }
-                                );
-                            }
+            "use strict";
+            var s = 0;
 
-                            function addText() {
-                                var t = $("#word").val().replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                                console.log("adding " + t + " !");
-                                $.ajax({
-                                    url: 'https://api.parse.com/1/classes/text',
-                                    type: 'post',
-                                    data: "{\"text\":\"" + t + "\"}"
-                                    ,
-                                    headers: {
-                                        "Content-Type": 'application/json',
-                                        "X-Parse-Application-ID": '3xx3CfBwwkCkHcLok4F8ODmVENZjQ0YPXYYJMzCT',
-                                        "X-Parse-REST-API-Key": 'LrbuMV5t4H1ReGkaHc3QVpz4JInd8agUltaEdG6y',
-                                    },
-                                    success: function (data) {
-                                        $("#thePiece").html($("#thePiece").html() + " " + t);
-                                        setTimeout(function () {
-                                            console.log(data.objectId);
-                                        }, 3000);
-                                        getText();
-                                    }
-                                }
-                                );
-                            }
+            function getText() {
+                console.log("ready!");
+                $.ajax({
+                    url: 'https://api.parse.com/1/classes/text',
+                    type: 'get',
+                    data: {
+                        limit: 1000,
+                        skip: s,
+                    },
+                    headers: {
+                        "Content-Type": 'application/json',
+                        "X-Parse-Application-ID": '3xx3CfBwwkCkHcLok4F8ODmVENZjQ0YPXYYJMzCT',
+                        "X-Parse-REST-API-Key": 'LrbuMV5t4H1ReGkaHc3QVpz4JInd8agUltaEdG6y',
+                    },
+                    success: function(data) {
+
+                        for (var i = s; i < data.results.length; i++) {
+                            $("#thePiece").append(data.results[i].text + " ");
+                            s = data.results.length;
+                        }
+                    }
+                });
+            }
+
+            function addText() {
+                var t = $("#word").val().replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                console.log("adding " + t + " !");
+                $.ajax({
+                    url: 'https://api.parse.com/1/classes/text',
+                    type: 'post',
+                    data: "{\"text\":\"" + t + "\"}",
+                    headers: {
+                        "Content-Type": 'application/json',
+                        "X-Parse-Application-ID": '3xx3CfBwwkCkHcLok4F8ODmVENZjQ0YPXYYJMzCT',
+                        "X-Parse-REST-API-Key": 'LrbuMV5t4H1ReGkaHc3QVpz4JInd8agUltaEdG6y',
+                    },
+                    success: function(data) {
+                        $("#thePiece").html($("#thePiece").html() + " " + t);
+                        setTimeout(function() {
+                            console.log(data.objectId);
+                        }, 3000);
+                        getText();
+                    }
+                });
+            }
 
 
 
-                            $(document).ready(function () {
-                                getText();
-                                setInterval(function () {
-                                    getText();
-                                }, 5000);
-                            });
-
+            $(document).ready(function() {
+                $("#thePiece").html("");
+                getText();
+                setInterval(function() {
+                    getText();
+                }, 5000);
+            });
         </script>
 
     </body>
